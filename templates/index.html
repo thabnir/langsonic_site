@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LangSonic - Audio Recorder</title>
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <script>
+      let mediaRecorder;
+      let audioChunks = [];
+
+      async function startRecording() {
+        document.getElementById("recordButton").disabled = true;
+        document.getElementById("stopButton").disabled = false;
+
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: true,
+        });
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = (event) => {
+          audioChunks.push(event.data);
+        };
+        mediaRecorder.onstop = sendAudioToServer;
+
+        mediaRecorder.start();
+      }
+
+      function stopRecording() {
+        document.getElementById("recordButton").disabled = false;
+        document.getElementById("stopButton").disabled = true;
+
+        mediaRecorder.stop();
+      }
+
+      function sendAudioToServer() {
+        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        const formData = new FormData();
+        formData.append("file", audioBlob, "recording.wav");
+
+        fetch("/upload", { method: "POST", body: formData })
+          .then((response) => response.text()) // We expect a text response (HTML)
+          .then((html) => {
+            // Inject the HTML response into the resultsContainer
+            document.getElementById("resultsContainer").innerHTML = html;
+            console.log(
+              "New HTML response at:",
+              new Date().toLocaleTimeString(),
+              "Response: ",
+              html
+            );
+            // Reset the audio chunks
+            audioChunks = [];
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <a class="navbar-brand" href="#">LangSonic</a>
+    </nav>
+
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">Audio Recorder</h1>
+
+      <div class="text-center">
+        <button
+          id="recordButton"
+          class="btn btn-danger btn-lg"
+          onclick="startRecording()"
+        >
+          Start Recording
+        </button>
+        <button
+          id="stopButton"
+          class="btn btn-secondary btn-lg"
+          onclick="stopRecording()"
+          disabled
+        >
+          Stop Recording
+        </button>
+      </div>
+
+      <div id="resultsContainer" class="mt-4"></div>
+    </div>
+
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
