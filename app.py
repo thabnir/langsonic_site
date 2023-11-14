@@ -124,3 +124,45 @@ def do_tests():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5678)
+
+
+# gunicorn version of the app below
+# doesn't work beacuse of ssl issues.
+# idk how to fix it
+# there are tons of bugs with gunicorn in general
+# so I'm just going to use the flask dev server for now
+
+# https://stackoverflow.com/questions/50236117/ssl-error-in-gunicorn-when-using-flask
+
+# import ssl
+
+# ssl._create_default_https_context = ssl._create_unverified_context
+
+# from gunicorn.app.base import BaseApplication
+
+
+# class StandaloneApplication(BaseApplication):
+#     def __init__(self, app, options=None):
+#         self.options = options or {}
+#         self.application = app
+#         super().__init__()
+
+#     def load_config(self):
+#         for key, value in self.options.items():
+#             if key in self.cfg.settings and value is not None:
+#                 self.cfg.set(key.lower(), value)
+
+#     def load(self):
+#         return self.application
+
+
+# options = {
+#     "bind": "0.0.0.0:5678",  # Specify the interface and port
+#     "workers": 4,  # Specify the number of worker processes
+#     "debug": True,
+#     "certfile": "cert.pem",
+#     "keyfile": "key.pem",
+# }
+
+# if __name__ == "__main__":
+#     StandaloneApplication(app, options).run()
