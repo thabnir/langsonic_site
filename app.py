@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 import tensorflow as tf
 import audiotospect
 import numpy as np
+import os
 
 app = Flask(__name__)
 
@@ -26,6 +27,7 @@ def upload():
 
     if file:
         filepath = f"./temp/{file.filename}"
+        os.makedirs("./temp/", exist_ok=True)
         print(filepath)
         file.save(filepath)
         # delete the file

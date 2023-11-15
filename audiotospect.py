@@ -3,8 +3,6 @@ import numpy as np
 import librosa
 import resampy
 
-# import soundfile as sf
-
 
 def audio_to_spect(
     audiopath: str,
