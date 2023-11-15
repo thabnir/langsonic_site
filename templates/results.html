@@ -19,10 +19,13 @@
         The predicted language is:
         <strong>{{ prediction[0][0] }}</strong>
       </p>
-      <p>Confidence: <strong>{{ prediction[0][1] | round(2) }}</strong></p>
+      <p>Confidence: <strong>{{ prediction[0][1] | round(1) }}%</strong></p>
 
       <h3>All Predictions</h3>
       <table class="table">
+        <caption class="sr-only">
+          Prediction results table
+        </caption>
         <thead>
           <tr>
             <th>Language</th>
@@ -33,7 +36,7 @@
           {% for language, probability in prediction %}
           <tr>
             <td>{{ language }}</td>
-            <td>{{ probability | round(2) }}</td>
+            <td>{{ probability | round(1) }}%</td>
           </tr>
           {% endfor %}
         </tbody>

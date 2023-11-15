@@ -7,6 +7,7 @@ import os
 app = Flask(__name__)
 
 model = tf.keras.models.load_model("cnn.h5")
+
 if model is not None:
     model.test_on_batch(np.zeros((1, 13, 250, 1)), np.zeros((1, 5)))
 
@@ -28,14 +29,23 @@ def upload():
         return render_template("index.html", error="No selected file")
 
     if file:
-        filepath = f"./data/{file.filename}"
+        filepath = f"./temp/{file.filename}"
         print(filepath)
         file.save(filepath)
-        prediction = predict_from_mp3(filepath)
         # delete the file
         # os.remove(filepath)
+
+        prediction = predict_from_audio(filepath)
+
+        # convert to percent
+        prediction = [prediction * 100 for prediction in prediction]
+
+        # convert from language code to language name
+        languages = [LANGUAGES[lang] for lang in langs]
+
         # convert to a list of tuples, where each tuple is (language, probability)
-        prediction = list(zip(langs, prediction))
+        prediction = list(zip(languages, prediction))
+
         # sort them by probability
         print(prediction)
         prediction.sort(key=lambda x: x[1], reverse=True)
@@ -46,7 +56,7 @@ def upload():
     return render_template("index.html", error="Something went wrong")
 
 
-def predict_from_mp3(path):
+def predict_from_audio(path):
     """
     Args:
         path: path to the mp3 file
@@ -54,9 +64,8 @@ def predict_from_mp3(path):
     Returns:
         list containing the probabilities for each language
     """
-    return model.predict(np.array([mp3tospect.model_input_from_audio(path)])).tolist()[
-        0
-    ]
+    model_in = mp3tospect.model_input_from_audio(path)
+    return model.predict(np.array([model_in])).tolist()[0]
 
 
 from languages import LANGUAGES
@@ -90,7 +99,7 @@ def do_tests():
         all_files.extend([os.path.join(path, file) for file in files])
 
     # get the predictions for each file
-    predictions = [get_langcode(predict_from_mp3(path)) for path in all_files]
+    predictions = [get_langcode(predict_from_audio(path)) for path in all_files]
 
     # match language based on the path name, for example if it's in `../data/mp3/it/` it's Italian, 'it'
     actual = [path.split("/")[-2] for path in all_files]
