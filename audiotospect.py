@@ -1,23 +1,31 @@
+from PIL import Image
 import numpy as np
 import librosa
 import resampy
-import soundfile as sf
-from PIL import Image
+
+# import soundfile as sf
 
 
-IMG_DIM = (13, 250, 1)
-
-
-def model_input_from_audio(
-    filepath,
-    target_size=(13, 1000),
+def audio_to_spect(
+    audiopath: str,
+    target_size: tuple[int, int] = (13, 1000),
+    img_dimensions: tuple[int, int, int] = (13, 250, 1),
+    output_filepath="./temp/temp.png",
+    save=True,
+    sr_new=16000,
+    hop_length=160,
+    n_fft=400,
 ):
+    """
+    Based on defaults for WhisperFeatureExtractor in order to provide the same input as the model was trained on
+    """
+
     def scale_minmax(X, min=0.0, max=1.0):
         X_std = (X - X.min()) / (X.max() - X.min())
         X_scaled = X_std * (max - min) + min
         return X_scaled
 
-    def img_to_array_in_memory(spec):
+    def img_to_array_in_memory(spec, filepath="./temp/temp.png", save=False):
         # scale, otherwise it's from -80 to 80 (or something) (cause decibels)
         scaled_spec = scale_minmax(spec, 0, 255).astype(np.uint8)
 
@@ -25,23 +33,19 @@ def model_input_from_audio(
 
         img_pil = Image.fromarray(np.uint8(img))
 
-        img_pil = img_pil.resize((IMG_DIM[1], IMG_DIM[0])).convert("L")
+        img_pil = img_pil.resize((img_dimensions[1], img_dimensions[0])).convert("L")
         # crunch it to 250x13
 
-        img_pil.save("./temp/temp.png")
+        if save:
+            print(f"Saving to {filepath}")
+            img_pil.save(filepath)  # useful for debugging
 
         # return the image as a numpy array in the range [0, 1]
         return np.array(img_pil) / 255.0
 
-    # Load and resample the audio file
-    # based on defaults for WhisperFeatureExtractor
-    # in order to provide the same input as the model was trained on
-    sr_new = 16000
-    hop_length = 160
-    n_fft = 400
-
-    signal, sr = librosa.load(filepath, res_type="kaiser_fast")
+    # TODO: figure out the error with this (it still works though)
     # print(f"Trying to load {filepath}")
+    signal, sr = librosa.load(audiopath, res_type="kaiser_fast")
     # signal, sr = sf.read(filepath)
 
     signal = resampy.resample(signal, sr_orig=sr, sr_new=sr_new, res_type="kaiser_fast")
@@ -72,4 +76,4 @@ def model_input_from_audio(
     elif current_length > target_size[1]:
         input_features = input_features[:, : target_size[1]]  # crop
 
-    return img_to_array_in_memory(input_features)
+    return img_to_array_in_memory(input_features, output_filepath, save=save)

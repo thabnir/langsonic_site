@@ -38,9 +38,9 @@
       }
 
       function sendAudioToServer() {
-        const audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
         const formData = new FormData();
-        formData.append("file", audioBlob, "recording.wav");
+        formData.append("file", audioBlob, "recording.webm");
 
         fetch("/upload", { method: "POST", body: formData })
           .then((response) => response.text()) // We expect a text response (HTML)
