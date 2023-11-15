@@ -1,4 +1,3 @@
-from PIL import Image
 import numpy as np
 import librosa
 import resampy
@@ -29,17 +28,12 @@ def audio_to_spect(
 
         img = np.flip(scaled_spec, axis=0)  # Low frequencies at the bottom
 
-        img_pil = Image.fromarray(np.uint8(img))
-
-        img_pil = img_pil.resize((img_dimensions[1], img_dimensions[0])).convert("L")
-        # crunch it to 250x13
-
-        if save:
-            print(f"Saving to {filepath}")
-            img_pil.save(filepath)  # useful for debugging
+        # Convert to grayscale and resize
+        img_np = np.uint8(img)
+        img_np = np.resize(img_np, img_dimensions)
 
         # return the image as a numpy array in the range [0, 1]
-        return np.array(img_pil) / 255.0
+        return img_np / 255.0
 
     # TODO: figure out the error with this (it still works though)
     # print(f"Trying to load {filepath}")
