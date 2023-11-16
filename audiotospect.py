@@ -24,16 +24,19 @@ def audio_to_spect(
 
     def img_to_array_in_memory(spec, filepath="./temp/temp.png", save=False):
         # scale, otherwise it's from -80 to 80 (or something) (cause decibels)
-        scaled_spec = scale_minmax(spec, 0, 255).astype(np.uint8)
+        img = scale_minmax(spec, 0, 255).astype(np.uint8)
+        img = np.flip(img, axis=0)  # Low frequencies at the bottom
+        img_np = np.uint8(img) / 255.0
+        # shape is (13, 1000)
 
-        img = np.flip(scaled_spec, axis=0)  # Low frequencies at the bottom
+        # Resize without interpolation; subsample the image by keeping one column out of every 4 columns (1000 cols -> 250 cols)
+        img_np = img_np[:, ::4]  # 13 rows, 250 columns
 
-        # Convert to grayscale and resize
-        img_np = np.uint8(img)
-        img_np = np.resize(img_np, img_dimensions)
+        # need to convert to (13, 250, 1) for the model
+        img_np = np.expand_dims(img_np, axis=-1)  # Add last (1) channel to the end
 
         # return the image as a numpy array in the range [0, 1]
-        return img_np / 255.0
+        return img_np
 
     # TODO: figure out the error with this (it still works though)
     # print(f"Trying to load {filepath}")
