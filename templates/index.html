@@ -12,11 +12,14 @@
     />
     <style>
       body {
-        background-image: url("https://coolbackgrounds.io/images/backgrounds/index/compute-ea4c57a4.png");
+        background-image: url("/static/tech_bg.jpg");
         background-repeat: no-repeat;
         background-attachment: fixed;
         background-size: cover;
         color: aliceblue;
+      }
+      #main-div {
+        width: auto;
       }
     </style>
     <script>
@@ -70,13 +73,17 @@
     </script>
   </head>
   <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <a class="navbar-brand" href="#">LangSonic</a>
-    </nav>
-    <div class="container mt-5">
-      <h1 class="text-center mb-4">Audio Recorder</h1>
+    <div class="container mt-5" id="main-div">
+      <h1 class="text-center mb-4 display-4">LangSonic</h1>
+      <!-- <h1 class="text-center mb-4">Audio Recorder</h1> -->
 
       <div class="text-center">
+        <p class="mb-4">
+          Click the "Start Recording" button, speak in English, French, German,
+          Spanish, or Italian and then click "Stop Recording" to let the AI
+          guess the language.
+        </p>
+
         <button
           id="recordButton"
           class="btn btn-danger btn-lg"
