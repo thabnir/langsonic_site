@@ -10,40 +10,70 @@
       integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
       crossorigin="anonymous"
     />
+    <style>
+      body {
+        background-image: url("https://coolbackgrounds.io/images/backgrounds/index/compute-ea4c57a4.png");
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+        color: aliceblue;
+      }
+      .results {
+        position: relative;
+        color: aliceblue;
+        padding: 20px;
+        overflow: hidden;
+        border-radius: 10px;
+        backdrop-filter: blur(10px);
+        background-color: rgba(255, 255, 255, 0.07);
+        max-width: 50%;
+        margin: auto;
+        border-style: solid;
+        transition: transform 0.3s ease, backdrop-filter .3s ease, background-color 0.3s ease;
+      }
+      .results:hover {
+        background-color: rgba(0, 0, 0, 0.2); /* Darker background on hover */
+        backdrop-filter: blur(20px);
+        transform: scale(1.05);
+      }
+
+    </style>
   </head>
   <body>
-    <div class="container mt-5">
-      <h2>Prediction Results</h2>
-      {% if prediction %}
-      <p>
-        The predicted language is:
-        <strong>{{ prediction[0][0] }}</strong>
-      </p>
-      <p>Confidence: <strong>{{ prediction[0][1] | round(1) }}%</strong></p>
+    <div class="results">
+      <div class="container mt-5">
+        <h2>Prediction Results</h2>
+        {% if prediction %}
+        <p>
+          The predicted language is:
+          <strong>{{ prediction[0][0] }}</strong>
+        </p>
+        <p>Confidence: <strong>{{ prediction[0][1] | round(1) }}%</strong></p>
 
-      <h3>All Predictions</h3>
-      <table class="table">
-        <caption class="sr-only">
-          Prediction results table
-        </caption>
-        <thead>
-          <tr>
-            <th>Language</th>
-            <th>Confidence</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for language, probability in prediction %}
-          <tr>
-            <td>{{ language }}</td>
-            <td>{{ probability | round(1) }}%</td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <p>No prediction data available.</p>
-      {% endif %}
+        <h3>All Predictions</h3>
+        <table class="table">
+          <caption class="sr-only">
+            Prediction results table
+          </caption>
+          <thead>
+            <tr>
+              <th>Language</th>
+              <th>Confidence</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for language, probability in prediction %}
+            <tr>
+              <td>{{ language }}</td>
+              <td>{{ probability | round(1) }}%</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <p>No prediction data available.</p>
+        {% endif %}
+      </div>
     </div>
 
     <script
